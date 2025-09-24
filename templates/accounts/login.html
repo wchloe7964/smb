@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - SmartBank 2025{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-8 mt-8">
+    <div class="text-center mb-8">
+        <i class="fas fa-robot text-6xl text-blue-600 mb-4"></i>
+        <h2 class="text-3xl font-bold text-gray-800">Welcome Back</h2>
+        <p class="text-gray-600">Sign in to your SmartBank account</p>
+    </div>
+
+    {% if form.errors %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        Invalid username or password. Please try again.
+    </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+        
+        <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-user mr-2"></i>Username
+            </label>
+            <input type="text" name="username" id="username" required
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-lock mr-2"></i>Password
+            </label>
+            <input type="password" name="password" id="password" required
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <button type="submit" 
+                class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition duration-200">
+            <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+        </button>
+    </form>
+
+    <div class="text-center mt-6">
+        <p class="text-gray-600">Don't have an account?</p>
+        <a href="{% url 'register' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            Create one here
+        </a>
+    </div>
+
+    <div class="mt-8 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <p class="text-sm text-yellow-800 text-center">
+            <i class="fas fa-info-circle mr-1"></i>
+            Demo accounts are created automatically upon registration
+        </p>
+    </div>
+</div>
+{% endblock %}

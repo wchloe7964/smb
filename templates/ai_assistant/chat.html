@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Assistant - SmartBank 2025{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="mb-8 text-center">
+        <div class="flex items-center justify-center space-x-3 mb-4">
+            <i class="fas fa-robot text-4xl text-blue-600"></i>
+            <h1 class="text-4xl font-bold text-gray-800">AI Financial Assistant</h1>
+        </div>
+        <p class="text-gray-600">Get intelligent insights about your finances. I can help with balances, spending analysis, and savings advice.</p>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <!-- Chat Header -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-robot text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold">SmartBank AI</h2>
+                    <p class="text-blue-100">Ready to help with your financial questions</p>
+                </div>
+                <div class="ml-auto">
+                    <div class="flex items-center space-x-2 bg-white bg-opacity-20 rounded-full px-3 py-1">
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span class="text-sm">Online</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div id="chat-messages" class="h-96 overflow-y-auto p-6 space-y-4 bg-gray-50">
+            <!-- Welcome Message -->
+            <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-robot text-white text-sm"></i>
+                </div>
+                <div class="bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm max-w-3xl">
+                    <p class="text-gray-800">Hello {{ user.username }}! I'm your SmartBank AI assistant. I can help you with:</p>
+                    <ul class="mt-2 text-gray-700 space-y-1">
+                        <li>• Checking account balances</li>
+                        <li>• Analyzing your spending habits</li>
+                        <li>• Providing savings recommendations</li>
+                        <li>• Showing recent transactions</li>
+                        <li>• Answering financial questions</li>
+                    </ul>
+                    <p class="mt-2 text-gray-600 text-sm">What would you like to know about your finances today?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="border-t border-gray-200 p-6">
+            <form id="chat-form" class="flex space-x-4">
+                {% csrf_token %}
+                <div class="flex-1 relative">
+                    <input type="text" 
+                           id="message-input" 
+                           placeholder="Ask me about your balances, spending, or savings..." 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-12"
+                           required>
+                    <button type="button" 
+                            id="voice-btn" 
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-600">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <button type="submit" 
+                        class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-2xl font-semibold hover:from-blue-700 hover:to-purple-700 transition duration-200">
+                    <i class="fas fa-paper-plane mr-2"></i>Send
+                </button>
+            </form>
+            
+            <!-- Quick Action Buttons -->
+            <div class="mt-4 flex flex-wrap gap-2">
+                <button class="quick-action bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-sm hover:bg-blue-100 transition duration-200">
+                    What's my total balance?
+                </button>
+                <button class="quick-action bg-green-50 text-green-600 px-3 py-2 rounded-lg text-sm hover:bg-green-100 transition duration-200">
+                    Where did I spend most this month?
+                </button>
+                <button class="quick-action bg-purple-50 text-purple-600 px-3 py-2 rounded-lg text-sm hover:bg-purple-100 transition duration-200">
+                    How can I save more?
+                </button>
+                <button class="quick-action bg-yellow-50 text-yellow-600 px-3 py-2 rounded-lg text-sm hover:bg-yellow-100 transition duration-200">
+                    Show recent transactions
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <i class="fas fa-balance-scale text-3xl text-blue-600 mb-3"></i>
+            <h3 class="font-semibold text-gray-800 mb-2">Balance Analysis</h3>
+            <p class="text-gray-600 text-sm">Get detailed insights into your account balances and cash flow</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <i class="fas fa-chart-pie text-3xl text-green-600 mb-3"></i>
+            <h3 class="font-semibold text-gray-800 mb-2">Spending Analytics</h3>
+            <p class="text-gray-600 text-sm">Understand your spending patterns and categories</p>
+        </div>
+        <div class="bg-white rounded-2xl shadow-lg p-6 text-center">
+            <i class="fas fa-lightbulb text-3xl text-yellow-600 mb-3"></i>
+            <h3 class="font-semibold text-gray-800 mb-2">Smart Advice</h3>
+            <p class="text-gray-600 text-sm">Personalized recommendations for saving and investing</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const quickActions = document.querySelectorAll('.quick-action');
+
+    // Scroll to bottom of chat
+    function scrollToBottom() {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // Add message to chat
+    function addMessage(content, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+        
+        messageDiv.innerHTML = `
+            <div class="w-8 h-8 ${isUser ? 'bg-gray-600' : 'bg-blue-600'} rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas ${isUser ? 'fa-user' : 'fa-robot'} text-white text-sm"></i>
+            </div>
+            <div class="bg-${isUser ? 'blue-600 text-white' : 'white'} rounded-2xl ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'} px-4 py-3 shadow-sm max-w-3xl">
+                <p>${content}</p>
+            </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    // Send message
+    async function sendMessage(message) {
+        addMessage(message, true);
+        messageInput.value = '';
+        messageInput.disabled = true;
+        
+        try {
+            const response = await fetch('{% url "chat_api" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({ message: message })
+            });
+            
+            const data = await response.json();
+            addMessage(data.response);
+        } catch (error) {
+            addMessage('Sorry, I encountered an error. Please try again.');
+        }
+        
+        messageInput.disabled = false;
+        messageInput.focus();
+    }
+
+    // Event listeners
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (message) {
+            sendMessage(message);
+        }
+    });
+
+    quickActions.forEach(button => {
+        button.addEventListener('click', function() {
+            messageInput.value = this.textContent;
+            sendMessage(this.textContent);
+        });
+    });
+
+    // Voice input (basic implementation)
+    document.getElementById('voice-btn').addEventListener('click', function() {
+        if ('webkitSpeechRecognition' in window) {
+            const recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            recognition.onstart = function() {
+                this.style.color = '#dc2626';
+            };
+            
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                messageInput.value = transcript;
+            };
+            
+            recognition.onerror = function() {
+                this.style.color = '#9ca3af';
+            };
+            
+            recognition.onend = function() {
+                this.style.color = '#9ca3af';
+            };
+            
+            recognition.start();
+        } else {
+            alert('Speech recognition not supported in this browser.');
+        }
+    });
+
+    // Focus input on load
+    messageInput.focus();
+</script>
+
+<style>
+    #chat-messages {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e0 #f7fafc;
+    }
+    
+    #chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    #chat-messages::-webkit-scrollbar-track {
+        background: #f7fafc;
+    }
+    
+    #chat-messages::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}

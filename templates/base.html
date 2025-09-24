@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartBank 2025 - {% block title %}Intelligent Banking{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <nav class="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-robot text-2xl"></i>
+                    <h1 class="text-2xl font-bold">SmartBank 2025</h1>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="flex items-center space-x-6">
+                    <a href="{% url 'dashboard' %}" class="hover:text-blue-200 transition duration-200 {% if request.path == '/' %}font-semibold underline{% endif %}">
+                        <i class="fas fa-home mr-1"></i>Dashboard
+                    </a>
+                    <a href="{% url 'ai_assistant' %}" class="hover:text-blue-200 transition duration-200 {% if 'ai' in request.path %}font-semibold underline{% endif %}">
+                        <i class="fas fa-comments mr-1"></i>AI Assistant
+                    </a>
+                    <a href="{% url 'financial_goals' %}" class="hover:text-blue-200 transition duration-200 {% if 'goals' in request.path %}font-semibold underline{% endif %}">
+                        <i class="fas fa-bullseye mr-1"></i>Goals
+                    </a>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ user.username }}</span>
+                    </div>
+                    <a href="{% url 'logout' %}" class="bg-red-500 hover:bg-red-600 px-3 py-1 rounded transition duration-200">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
+                </div>
+                {% else %}
+                <div class="space-x-4">
+                    <a href="{% url 'login' %}" class="hover:text-blue-200 transition duration-200">Login</a>
+                    <a href="{% url 'register' %}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded transition duration-200">Sign Up</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mx-auto px-4 mt-4">
+        {% for message in messages %}
+        <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 mb-4 rounded shadow">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="container mx-auto px-4 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center">
+                <div class="flex justify-center space-x-6 mb-4">
+                    <a href="#" class="hover:text-blue-300 transition duration-200">
+                        <i class="fas fa-shield-alt mr-2"></i>Security
+                    </a>
+                    <a href="#" class="hover:text-blue-300 transition duration-200">
+                        <i class="fas fa-question-circle mr-2"></i>Help
+                    </a>
+                    <a href="#" class="hover:text-blue-300 transition duration-200">
+                        <i class="fas fa-envelope mr-2"></i>Contact
+                    </a>
+                </div>
+                <p class="text-gray-400">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    This is a prototype demonstration only. Not a real banking application.
+                </p>
+                <p class="text-gray-400 mt-2">&copy; 2025 SmartBank. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

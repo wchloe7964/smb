@@ -1,0 +1,27 @@
+{% if messages %}
+<div class="container mx-auto px-4 mt-4">
+    {% for message in messages %}
+    <div class="relative py-3 px-4 rounded-lg border-l-4 {% if message.tags == 'success' %}bg-green-100 border-green-500 text-green-700{% elif message.tags == 'error' %}bg-red-100 border-red-500 text-red-700{% elif message.tags == 'warning' %}bg-yellow-100 border-yellow-500 text-yellow-700{% else %}bg-blue-100 border-blue-500 text-blue-700{% endif %}">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                {% if message.tags == 'success' %}
+                <i class="fas fa-check-circle"></i>
+                {% elif message.tags == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+                {% elif message.tags == 'warning' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                <i class="fas fa-info-circle"></i>
+                {% endif %}
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium">{{ message }}</p>
+            </div>
+            <div class="ml-auto pl-3">
+                <button onclick="this.parentElement.parentElement.parentElement.style.display='none'" class="text-xl leading-none">&times;</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

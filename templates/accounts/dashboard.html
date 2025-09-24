@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SmartBank 2025{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <h1 class="text-4xl font-bold text-gray-800">Welcome back, {{ user.username }}!</h1>
+    <p class="text-gray-600 mt-2">Here's your financial overview</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Left Column - Main Content -->
+    <div class="lg:col-span-2 space-y-8">
+        <!-- Financial Health Card -->
+        <div class="bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-2xl shadow-xl p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-2xl font-bold mb-2">Financial Health</h2>
+                    <p class="text-3xl font-bold {{ health_color }}">{{ health_score }}</p>
+                    <p class="mt-2 opacity-90">Total Balance: ${{ total_balance|floatformat:2 }}</p>
+                </div>
+                <div class="text-4xl">
+                    {% if health_score == "Excellent" %}
+                    <i class="fas fa-trophy"></i>
+                    {% elif health_score == "Good" %}
+                    <i class="fas fa-smile"></i>
+                    {% elif health_score == "Fair" %}
+                    <i class="fas fa-meh"></i>
+                    {% else %}
+                    <i class="fas fa-exclamation-triangle"></i>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Accounts Summary -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Your Accounts</h2>
+                <span class="text-green-600 font-semibold">${{ total_balance|floatformat:2 }}</span>
+            </div>
+            
+            <div class="space-y-4">
+                {% for account in accounts %}
+                <div class="flex justify-between items-center p-4 border border-gray-200 rounded-xl hover:border-blue-300 transition duration-200">
+                    <div>
+                        <div class="flex items-center space-x-3">
+                            {% if account.account_type == 'checking' %}
+                            <i class="fas fa-wallet text-blue-600 text-xl"></i>
+                            {% else %}
+                            <i class="fas fa-piggy-bank text-green-600 text-xl"></i>
+                            {% endif %}
+                            <div>
+                                <h3 class="font-semibold text-gray-800">{{ account.get_account_type_display }}</h3>
+                                <p class="text-sm text-gray-600">***{{ account.account_number|slice:"-4:" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="text-lg font-bold text-gray-800">${{ account.balance|floatformat:2 }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Recent Transactions</h2>
+            
+            <div class="space-y-3">
+                {% for transaction in recent_transactions %}
+                <a href="{% url 'transaction_detail' transaction.transaction_id %}" 
+                   class="block p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:bg-blue-50 transition duration-200">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                {% if transaction.transaction_type == 'credit' %}
+                                <i class="fas fa-arrow-down text-green-600"></i>
+                                {% else %}
+                                <i class="fas fa-arrow-up text-red-600"></i>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">{{ transaction.description }}</h3>
+                                <p class="text-sm text-gray-600">
+                                    {{ transaction.merchant }} • 
+                                    {{ transaction.date|date:"M d, Y" }} • 
+                                    <span class="capitalize">{{ transaction.category }}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <span class="text-lg font-semibold {% if transaction.transaction_type == 'credit' %}text-green-600{% else %}text-red-600{% endif %}">
+                            {% if transaction.transaction_type == 'debit' %}-{% endif %}${{ transaction.amount|floatformat:2 }}
+                        </span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column - Sidebar -->
+    <div class="space-y-8">
+        <!-- AI Assistant Quick Access -->
+        <div class="bg-gradient-to-br from-green-500 to-blue-600 text-white rounded-2xl shadow-xl p-6">
+            <div class="text-center">
+                <i class="fas fa-robot text-4xl mb-3"></i>
+                <h3 class="text-xl font-bold mb-2">AI Assistant</h3>
+                <p class="text-green-100 mb-4">Get smart insights about your finances</p>
+                <a href="{% url 'ai_assistant' %}" 
+                   class="inline-block bg-white text-green-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-200">
+                    <i class="fas fa-comments mr-2"></i>Chat Now
+                </a>
+            </div>
+        </div>
+
+        <!-- Financial Goals -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-800">Financial Goals</h3>
+                <a href="{% url 'financial_goals' %}" class="text-blue-600 hover:text-blue-800 text-sm">View All</a>
+            </div>
+            
+            <div class="space-y-4">
+                {% for goal in goals %}
+                <div class="border border-gray-200 rounded-xl p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-semibold text-gray-800">{{ goal.name }}</h4>
+                        <span class="text-sm font-semibold">${{ goal.current_amount|floatformat:0 }}/${{ goal.target_amount|floatformat:0 }}</span>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div class="bg-green-600 h-2 rounded-full" 
+                             style="width: {{ goal.progress_percentage }}%"></div>
+                    </div>
+                    
+                    <div class="flex justify-between text-xs text-gray-600">
+                        <span>{{ goal.progress_percentage|floatformat:0 }}% Complete</span>
+                        <span>Due: {{ goal.target_date|date:"M Y" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                {% if not goals %}
+                <div class="text-center py-4 text-gray-500">
+                    <i class="fas fa-bullseye text-2xl mb-2"></i>
+                    <p>No goals set yet</p>
+                    <a href="{% url 'financial_goals' %}" class="text-blue-600 hover:text-blue-800 text-sm">Create your first goal</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{% url 'ai_assistant' %}" 
+                   class="bg-blue-50 text-blue-600 p-3 rounded-lg text-center hover:bg-blue-100 transition duration-200">
+                    <i class="fas fa-robot text-lg mb-1"></i>
+                    <p class="text-xs font-semibold">AI Help</p>
+                </a>
+                
+                <a href="{% url 'financial_goals' %}" 
+                   class="bg-green-50 text-green-600 p-3 rounded-lg text-center hover:bg-green-100 transition duration-200">
+                    <i class="fas fa-bullseye text-lg mb-1"></i>
+                    <p class="text-xs font-semibold">Set Goals</p>
+                </a>
+                
+                <div class="bg-purple-50 text-purple-600 p-3 rounded-lg text-center cursor-not-allowed opacity-50">
+                    <i class="fas fa-exchange-alt text-lg mb-1"></i>
+                    <p class="text-xs font-semibold">Transfer</p>
+                </div>
+                
+                <div class="bg-yellow-50 text-yellow-600 p-3 rounded-lg text-center cursor-not-allowed opacity-50">
+                    <i class="fas fa-chart-line text-lg mb-1"></i>
+                    <p class="text-xs font-semibold">Analytics</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Security Status -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="flex items-center space-x-3 mb-3">
+                <i class="fas fa-shield-alt text-green-600 text-xl"></i>
+                <h3 class="text-xl font-bold text-gray-800">Security Status</h3>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-green-800 font-semibold">All Systems Secure</span>
+                    <i class="fas fa-check-circle text-green-600"></i>
+                </div>
+                <p class="text-xs text-green-600 mt-1">Last login: Today</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
